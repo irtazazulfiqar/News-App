@@ -108,6 +108,13 @@ DATABASES = {
         'PASSWORD': os.getenv('DB_PASSWORD'),  # Replace with your new MySQL password
         'HOST': os.getenv('DB_HOST'),  # The host of your MySQL server
         'PORT': os.getenv('DB_PORT'),  # The port of your MySQL server
+    },
+    'mongodb': {
+        'ENGINE': 'djongo',
+        'NAME': os.getenv('MONGO_DB_NAME'),
+        'CLIENT': {
+            'host': os.getenv('MONGO_URI'),
+        }
     }
 }
 
