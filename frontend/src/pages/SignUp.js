@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { TextField, Button, Typography, Container, Box } from '@mui/material';
 
 function SignUp() {
   const [formData, setFormData] = useState({
@@ -45,57 +46,71 @@ function SignUp() {
   };
 
   return (
-    <div className="container">
-      <h2>Sign Up</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>Username</label>
-          <input
-            type="text"
+    <Container maxWidth="sm">
+      <Box sx={{ marginTop: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Typography component="h1" variant="h5">
+          Sign Up
+        </Typography>
+        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+          <TextField
+            fullWidth
+            label="Username"
             name="username"
             value={formData.username}
             onChange={handleChange}
+            error={!!errors.username}
+            helperText={errors.username && errors.username}
+            margin="normal"
             required
           />
-          {errors.username && <p className="error">{errors.username}</p>}
-        </div>
-        <div className="form-group">
-          <label>Email</label>
-          <input
-            type="email"
+          <TextField
+            fullWidth
+            label="Email"
             name="email"
+            type="email"
             value={formData.email}
             onChange={handleChange}
+            error={!!errors.email}
+            helperText={errors.email && errors.email}
+            margin="normal"
             required
           />
-          {errors.email && <p className="error">{errors.email}</p>}
-        </div>
-        <div className="form-group">
-          <label>Password</label>
-          <input
-            type="password"
+          <TextField
+            fullWidth
+            label="Password"
             name="password"
+            type="password"
             value={formData.password}
             onChange={handleChange}
+            error={!!errors.password}
+            helperText={errors.password && errors.password}
+            margin="normal"
             required
           />
-          {errors.password && <p className="error">{errors.password}</p>}
-        </div>
-        <div className="form-group">
-          <label>Confirm Password</label>
-          <input
-            type="password"
+          <TextField
+            fullWidth
+            label="Confirm Password"
             name="confirm_password"
+            type="password"
             value={formData.confirm_password}
             onChange={handleChange}
+            error={!!errors.confirm_password}
+            helperText={errors.confirm_password && errors.confirm_password}
+            margin="normal"
             required
           />
-          {errors.confirm_password && <p className="error">{errors.confirm_password}</p>}
-        </div>
-        <button type="submit" className="button">Sign Up</button>
-      </form>
-      {message && <p className="message">{message}</p>}
-    </div>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+          >
+            Sign Up
+          </Button>
+          {message && <Typography color="success.main">{message}</Typography>}
+        </Box>
+      </Box>
+    </Container>
   );
 }
 
