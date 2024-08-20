@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 import { Container, TextField, Button, Typography, Alert } from '@mui/material';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import { useNavigate } from 'react-router-dom';
 import { apiCall } from '../utility/useApi';
+import { useAuth } from '../context/authContext';
 
 function SignIn() {
+      const { login } = useAuth();
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
   const [message, setMessage] = useState('');
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -25,10 +28,12 @@ function SignIn() {
     const { success, data, errors } = await apiCall('http://127.0.0.1:8000/api/signin/', 'POST', formData);
 
     if (success) {
-      localStorage.setItem('access_token', data.access);
-      localStorage.setItem('refresh_token', data.refresh);
+      login(data.access, data.refresh);
       setMessage('Login successful');
       setErrors({});
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 1000);
     } else {
       setErrors(errors);
     }
