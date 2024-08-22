@@ -27,7 +27,7 @@ function SignUp() {
       return;
     }
 
-    const { success, data, errors } = await apiCall('http://127.0.0.1:8000/api/register/', 'POST', formData);
+    const { success, data, errors } = await apiCall('/api/register/', 'POST', formData);
 
     if (success) {
       setMessage('User created successfully');

@@ -25,7 +25,7 @@ function SignIn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { success, data, errors } = await apiCall('http://127.0.0.1:8000/api/signin/', 'POST', formData);
+    const { success, data, errors } = await apiCall('/api/signin/', 'POST', formData);
 
     if (success) {
       login(data.access, data.refresh);

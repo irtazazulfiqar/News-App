@@ -3,6 +3,7 @@ from datetime import timedelta
 from pathlib import Path
 import pymysql
 from dotenv import load_dotenv
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,7 +40,9 @@ INSTALLED_APPS = [
 ]
 
 REST_FRAMEWORK = {
-
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 6
+    ,
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
@@ -100,7 +103,7 @@ REST_FRAMEWORK = {
 
     # Pagination settings
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10,
+    'PAGE_SIZE': 6,
 
     # Throttling settings
     'DEFAULT_THROTTLE_CLASSES': [
@@ -230,3 +233,20 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 DATABASE_ROUTERS = ['backend.db_router.DatabaseRouter']
 
 AUTH_USER_MODEL = 'news.User'
+
+
+# Celery settings
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')  # URL for Redis broker
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND') # URL for Redis backend
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
+
+CELERY_BEAT_SCHEDULE = {
+    'run-scraper-every-10-minutes': {
+        'task': 'news.tasks.run_scraper',
+        'schedule': crontab(minute='*/10'),  # Executes every 10 minutes
+    },
+}
