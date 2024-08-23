@@ -22,6 +22,7 @@ function App() {
                 <Route path="/signin" element={<SignIn />} />
                 <Route path="/signup" element={<SignUp />} />
                 <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
+                <Route path="/articles/:id" element={<ProtectedRoute element={<ArticleDetails />} />} />
               </Routes>
             </Container>
           </Box>

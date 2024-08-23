@@ -1,19 +1,7 @@
-import os
-import sys
-
-import django
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
 import re
-
-# Set up Django environment
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-# Set up Django environment
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
-django.setup()
-
 from news.models.article import Article
 
 
@@ -75,7 +63,6 @@ class ArticleScraper:
             metadata['post_title'] = ArticleScraper.extract_text_from_tag(detail_heading.find('h1'), 'No title')
         else:
             metadata['post_title'] = 'No title'
-            print("No detail-heading div found.")
 
         detail_left_tittle = post_soup.find('div', class_='detail-left-tittle')
         if detail_left_tittle:
@@ -87,7 +74,6 @@ class ArticleScraper:
         else:
             metadata['author_name'] = 'No author'
             metadata['published_date'] = 'No date'
-            print("No detail-left-tittle div found.")
 
         return metadata
 
@@ -119,7 +105,7 @@ class ArticleScraper:
             return
 
         try:
-            # if not Article.objects.filter(post_title=post_details['post_title']).exists():
+            if not Article.objects.filter(post_title=post_details['post_title']).exists():
                 article = Article(
                     post_title=post_details['post_title'],
                     image_link=post_details.get('image_link', 'No image'),
@@ -128,14 +114,9 @@ class ArticleScraper:
                     content_paragraphs=post_details.get('content_paragraphs', [])
                 )
                 article.save()
-                print(post_details)
-                print(f"Saved article: {article.post_title}")
-            # else:
-            #     print(f"Article with title '{post_details['post_title']}' already exists.")
+
         except Exception as e:
-            # print(post_details)
             pass
-            # print(f"Error saving article: {e}")
 
     def extract_post_details(self, post_soup):
         """
@@ -151,9 +132,12 @@ class ArticleScraper:
         }
 
         if post_details['post_title'] == 'No title':
-            print("Skipping this post due to missing title.")
+            """
+            Skip this post due to missing title.
+            This might be some live broadcast, 
+            that we don't want.
+            """
             return None
-
         return post_details
 
     def process_story_links(self, story_items):
@@ -165,20 +149,21 @@ class ArticleScraper:
 
         for a_tag in all_tags:
             link = a_tag.get('href')
+
             if link and link not in processed_links:
                 processed_links.add(link)
                 post_soup = self.fetch_and_parse(link)
                 post_date = self.extract_post_date(post_soup)
+
                 try:
+                    # Checking the post-date before processing it
                     post_date_converted = self.convert_to_date(post_date)
                     if post_date_converted == self.target_date:
                         post_details = self.extract_post_details(post_soup)
                         self.save_article(post_details)
-                    else:
-                        print(
-                            f"Skipping article dated {post_date_converted}. Does not match target date {self.target_date}.")
+
                 except ValueError as e:
-                    print(f"Error processing date: {e}")
+                    pass
 
     @staticmethod
     def find_links(soup):
@@ -202,12 +187,3 @@ class ArticleScraper:
             if page_soup:
                 story_items = page_soup.find_all('div', class_='writter-list-item-story')
                 self.process_story_links(story_items)
-            else:
-                print(f"Failed to retrieve or parse the page at {link}.")
-
-
-# Usage example
-if __name__ == "__main__":
-    start_url = 'https://www.thenews.com.pk/'
-    scraper = ArticleScraper(start_url, '2024-08-22')
-    scraper.crawl()

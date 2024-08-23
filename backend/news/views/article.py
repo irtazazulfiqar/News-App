@@ -1,14 +1,14 @@
-from django.core.exceptions import ValidationError
 from rest_framework import generics, status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
-
+from rest_framework.views import APIView
 from ..models.article import Article
-from ..serializers.article import ArticleSerializer, DateValidatorSerializer
+from ..serializers.article import (ArticleSerializer, DateValidatorSerializer,
+                                   ArticleDateSerializer)
 
 
 class CustomPagination(PageNumberPagination):
-    page_size = 6
+    page_size = 100
     page_size_query_param = 'page_size'
     max_page_size = 100
 
@@ -25,7 +25,22 @@ class ArticleListByDateView(generics.ListAPIView):
         serializer = DateValidatorSerializer(data={'date': date_str})
         if not serializer.is_valid():
             # Return a response with validation errors if date is invalid
-            return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': serializer.errors},
+                            status=status.HTTP_400_BAD_REQUEST)
 
-        # Get filtered articles using the custom method in the serializer
-        return serializer.get_filtered_articles()
+        # Get filtered articles using the custom method in Article Model
+        return Article.get_filtered_articles(date_str)
+
+
+class ArticleDateListView(APIView):
+    def get(self, request, *args, **kwargs):
+        # Fetch the distinct published dates from the Article model
+
+        article_dates = Article.objects.values_list('published_date',
+                                                    flat=True).distinct()
+
+        # Pass the dates to the serializer as a list of dates
+        serializer = ArticleDateSerializer({'dates': article_dates})
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+

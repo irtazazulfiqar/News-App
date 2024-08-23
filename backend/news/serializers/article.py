@@ -1,6 +1,6 @@
+from django.utils.dateparse import parse_date
 from rest_framework import serializers
-from ..models.article import Article
-
+from news.models.article import Article
 
 
 class ArticleSerializer(serializers.ModelSerializer):
@@ -14,8 +14,9 @@ class ArticleSerializer(serializers.ModelSerializer):
 class DateValidatorSerializer(serializers.Serializer):
     date = serializers.DateField(input_formats=['%Y-%m-%d'])
 
-    def get_filtered_articles(self):
-        date_str = self.validated_data.get('date')
-        return (Article.objects.filter(published_date=date_str)
-                .exclude(image_link='No image')
-                )
+
+class ArticleDateSerializer(serializers.Serializer):
+    dates = serializers.ListField(
+        child=serializers.DateField(),
+        allow_empty=False
+    )

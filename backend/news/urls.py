@@ -6,7 +6,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
-from .views.article import ArticleListByDateView
+from .views.article import ArticleListByDateView, ArticleDateListView
 
 urlpatterns = [
     path('register/', RegisterUserView.as_view(), name='register'),
@@ -15,5 +15,5 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view, name='token_refresh'),
     path('token/verify/', CustomTokenVerifyView.as_view(), name='token_verify'),
     path('articles/', ArticleListByDateView.as_view(), name='articles_by_date'),
-
+    path('article-dates/', ArticleDateListView.as_view(), name='article-date-list'),
 ]

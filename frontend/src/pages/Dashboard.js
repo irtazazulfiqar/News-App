@@ -2,63 +2,75 @@ import React, { useEffect, useState } from 'react';
 import { Container, Typography, Card, CardContent, CardMedia, Grid, Pagination } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { apiCallWithAuth } from '../utility/authApi';
+import ArticleCalendar from '../components/Calender';
+import { format } from 'date-fns';
 
 function Dashboard() {
   const [articles, setArticles] = useState([]);
+  const [displayedArticles, setDisplayedArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [selectedDate, setSelectedDate] = useState(new Date()); // Default to current date
+
+useEffect(() => {
+  const fetchArticles = async () => {
+    const formattedDate = format(selectedDate, 'yyyy-MM-dd'); // Format the date
+    const articlesPerPage = 6;
+
+    try {
+      const result = await apiCallWithAuth(`/api/articles/?date=${formattedDate}`);
+
+      if (result.success) {
+        // Reset pagination state
+        setPage(1); // Reset page to 1 when date changes
+        setTotalPages(Math.ceil(result.data.results.length / articlesPerPage));
+
+        // Update articles and displayed articles
+        setArticles(result.data.results);
+        setDisplayedArticles(result.data.results.slice(0, articlesPerPage));
+      } else {
+        console.error('API Error:', result.errors);
+        setError(result.errors);
+      }
+    } catch (error) {
+      console.error('Fetch Error:', error);
+      setError({ error: 'Something went wrong' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchArticles();
+}, [selectedDate]); // Depend only on selectedDate for pagination reset
+
 
   useEffect(() => {
-    const fetchArticles = async () => {
-      const today = new Date().toISOString().split('T')[0];
-      const articlesPerPage = 6;
-
-      try {
-        const result = await apiCallWithAuth(`/api/articles/?date=${today}&page=${page}&limit=${articlesPerPage}`);
-
-        if (result.success) {
-          console.log('API Result:', result);
-
-          const updatedArticles = result.data.results.map(article => ({
-            ...article,
-            id: article.image_link,  // Use image link as unique id
-            content_paragraphs: Array.isArray(article.content_paragraphs)
-              ? article.content_paragraphs.map(paragraph => paragraph.replace(/"/g, '')) // Remove double quotes
-              : [],
-          }));
-
-          console.log('Updated Articles:', updatedArticles);
-
-          const validArticles = updatedArticles.filter(article => article.image_link && article.image_link !== 'No image');
-
-          setArticles(validArticles);
-          setTotalPages(Math.ceil(result.data.count / articlesPerPage));
-        } else {
-          console.error('API Error:', result.errors);
-          setError(result.errors);
-        }
-      } catch (error) {
-        console.error('Fetch Error:', error);
-        setError({ error: 'Something went wrong' });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchArticles();
-  }, [page]);
+    // Update displayed articles when the page changes
+    const articlesPerPage = 6;
+    setDisplayedArticles(articles.slice((page - 1) * articlesPerPage, page * articlesPerPage));
+  }, [page, articles]); // Depend on both page and articles
 
   const handlePageChange = (event, value) => {
     setPage(value);
   };
 
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+    if (date !== selectedDate){
+    // Reset to page 1 when the date changes but only if selected-date and
+    // current date are not equal
+        setPage(1);
+    }
+  };
+
   return (
     <Container maxWidth="md">
       <Typography variant="h3" gutterBottom>
-        Latest News For Today
+        Latest News
       </Typography>
+      <ArticleCalendar onDateChange={handleDateChange} />
       {loading ? (
         <Typography variant="body1">Loading...</Typography>
       ) : error ? (
@@ -67,14 +79,14 @@ function Dashboard() {
         </Typography>
       ) : (
         <>
-          {articles.length === 0 && !loading && (
+          {displayedArticles.length === 0 && !loading && (
             <Typography variant="body1">No articles available</Typography>
           )}
           <Grid container spacing={3}>
-            {articles.map((article) => (
-              <Grid item xs={12} sm={6} md={4} key={article.id}>
+            {displayedArticles.map((article) => (
+              <Grid item xs={12} sm={6} md={4} key={article.post_title}>
                 <Link
-                  to={`/articles/${encodeURIComponent(article.id)}`}
+                  to={`/articles/${encodeURIComponent(article.post_title)}`}
                   state={{ article }}
                   style={{ textDecoration: 'none' }}
                 >
@@ -98,13 +110,15 @@ function Dashboard() {
               </Grid>
             ))}
           </Grid>
-          <Pagination
-            count={totalPages}
-            page={page}
-            onChange={handlePageChange}
-            color="primary"
-            style={{ marginTop: 20 }}
-          />
+          {totalPages > 1 && (
+            <Pagination
+              count={totalPages}
+              page={page}
+              onChange={handlePageChange}
+              color="primary"
+              style={{ marginTop: 20 }}
+            />
+          )}
         </>
       )}
     </Container>
