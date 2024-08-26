@@ -1,11 +1,9 @@
 import axios from 'axios';
 
 const backendBaseUrl = process.env.REACT_APP_BACKEND_BASE_URL;
-console.log(backendBaseUrl)
 
 export const apiCallWithAuth = async (url, method = 'GET', body = null) => {
   const accessToken = localStorage.getItem('access_token');
-    console.log(backendBaseUrl+url)
   const options = {
     method,
     url: `${backendBaseUrl}${url}`,

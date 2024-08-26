@@ -31,11 +31,9 @@ useEffect(() => {
         setArticles(result.data.results);
         setDisplayedArticles(result.data.results.slice(0, articlesPerPage));
       } else {
-        console.error('API Error:', result.errors);
         setError(result.errors);
       }
     } catch (error) {
-      console.error('Fetch Error:', error);
       setError({ error: 'Something went wrong' });
     } finally {
       setLoading(false);
