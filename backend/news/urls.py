@@ -1,6 +1,5 @@
 from django.urls import path
-from .views.register import RegisterUserView
-# from .views.signin import LoginUserView
+from news.api.register import RegisterUserView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
