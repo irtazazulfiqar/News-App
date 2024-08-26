@@ -1,0 +1,17 @@
+backend/.env
+
+# Virtual Enviornment
+.venv
+
+# Pycharm files
+.idea/
+
+# Python files
+backend/.__pycache__/
+
+# Ignore Python bytecode files
+__pycache__/
+*.pyc
+
+# Node modules
+frontend/node_modules
