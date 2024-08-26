@@ -6,8 +6,8 @@ import Dashboard from './pages/Dashboard';
 import ArticleDetails from './pages/ArticleDetails';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import ProtectedRoute from './utility/protectedRoute';
-import { AuthProvider } from './context/authContext';
+import ProtectedRoute from './utility/ProtectedRoute';
+import { AuthProvider } from './context/AuthContext';
 import { Box, Container } from '@mui/material';
 
 function App() {
