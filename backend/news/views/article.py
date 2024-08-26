@@ -2,8 +2,8 @@ from rest_framework import generics, status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from ..models.article import Article
-from ..serializers.article import (ArticleSerializer, DateValidatorSerializer,
+from news.models.article import Article
+from news.serializers.article import (ArticleSerializer, DateValidatorSerializer,
                                    ArticleDateSerializer)
 
 

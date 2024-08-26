@@ -1,7 +1,7 @@
 from django.urls import path
-from .views.register import RegisterUserView
-from .views.signin import LoginUserView
-from .views.verify_token import CustomTokenVerifyView
+from news.views.register import RegisterUserView
+from news.views.signin import LoginUserView
+from news.views.verify_token import CustomTokenVerifyView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
