@@ -1,13 +1,40 @@
 import React, { useState } from 'react';
 import { TextField, Button, Typography, Container, Box } from '@mui/material';
-import { apiCall } from '../utility/useApi';
+import {apiCall} from 'utility/UseApi';
+// Define the config object with field properties
+const fieldConfig = {
+  username: {
+    label: 'Username',
+    name: 'username',
+    type: 'text',
+    required: true,
+  },
+  email: {
+    label: 'Email',
+    name: 'email',
+    type: 'email',
+    required: true,
+  },
+  password: {
+    label: 'Password',
+    name: 'password',
+    type: 'password',
+    required: true,
+  },
+  confirm_password: {
+    label: 'Confirm Password',
+    name: 'confirm_password',
+    type: 'password',
+    required: true,
+  },
+};
 
 function SignUp() {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
-    confirm_password: '',
+    confirm_password: ''
   });
   const [message, setMessage] = useState('');
   const [errors, setErrors] = useState({});
@@ -22,6 +49,7 @@ function SignUp() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Check if passwords match
     if (formData.password !== formData.confirm_password) {
       setErrors({ confirm_password: ['Passwords do not match'] });
       return;
@@ -33,7 +61,7 @@ function SignUp() {
       setMessage('User created successfully');
       setErrors({});
     } else {
-      setErrors(errors);
+      setErrors(data);
     }
   };
 
@@ -44,53 +72,21 @@ function SignUp() {
           Sign Up
         </Typography>
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-          <TextField
-            fullWidth
-            label="Username"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            error={!!errors.username}
-            helperText={errors.username && errors.username}
-            margin="normal"
-            required
-          />
-          <TextField
-            fullWidth
-            label="Email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            error={!!errors.email}
-            helperText={errors.email && errors.email}
-            margin="normal"
-            required
-          />
-          <TextField
-            fullWidth
-            label="Password"
-            name="password"
-            type="password"
-            value={formData.password}
-            onChange={handleChange}
-            error={!!errors.password}
-            helperText={errors.password && errors.password}
-            margin="normal"
-            required
-          />
-          <TextField
-            fullWidth
-            label="Confirm Password"
-            name="confirm_password"
-            type="password"
-            value={formData.confirm_password}
-            onChange={handleChange}
-            error={!!errors.confirm_password}
-            helperText={errors.confirm_password && errors.confirm_password}
-            margin="normal"
-            required
-          />
+          {Object.values(fieldConfig).map((field) => (
+            <TextField
+              key={field.name}
+              fullWidth
+              label={field.label}
+              name={field.name}
+              type={field.type}
+              value={formData[field.name]}
+              onChange={handleChange}
+              error={!!errors[field.name]}
+              helperText={errors[field.name] && errors[field.name]}
+              margin="normal"
+              required
+            />
+          ))}
           <Button
             type="submit"
             fullWidth
