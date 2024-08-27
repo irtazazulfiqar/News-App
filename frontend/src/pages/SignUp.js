@@ -1,31 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextField, Button, Typography, Container, Box } from '@mui/material';
-import {apiCall} from 'utility/UseApi';
-// Define the config object with field properties
+import { apiCall } from 'utils/useAPI';
+
 const fieldConfig = {
   username: {
     label: 'Username',
     name: 'username',
     type: 'text',
     required: true,
+    validate: (value) => value.length > 2 || 'Username must be at least 3 characters long',
   },
   email: {
     label: 'Email',
     name: 'email',
     type: 'email',
     required: true,
+    validate: (value) =>
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) || 'Enter a valid email address',
   },
   password: {
     label: 'Password',
     name: 'password',
     type: 'password',
     required: true,
+    validate: (value) => value.length >= 6 || 'Password must be at least 6 characters long',
   },
   confirm_password: {
     label: 'Confirm Password',
     name: 'confirm_password',
     type: 'password',
     required: true,
+    validate: (value, formData) =>
+      value === formData.password || 'Passwords do not match',
   },
 };
 
@@ -36,31 +42,70 @@ function SignUp() {
     password: '',
     confirm_password: ''
   });
-  const [message, setMessage] = useState('');
   const [errors, setErrors] = useState({});
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
 
+  // Handle field change and validate real-time
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+
+    // Validate immediately after change
+    validateField(name, value);
   };
+
+  // Validate individual fields
+  const validateField = (name, value) => {
+    const field = fieldConfig[name];
+    let error = '';
+
+    if (field.required && !value) {
+      error = `${field.label} is required`;
+    } else if (field.validate) {
+      const validationResult = field.validate(value, formData);
+      if (typeof validationResult === 'string') {
+        error = validationResult;
+      }
+    }
+
+    // Set the error state
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: error,
+    }));
+  };
+
+  // Validate the entire form and enable/disable the submit button
+  useEffect(() => {
+    // Check if all fields are valid
+    const formIsValid = Object.keys(fieldConfig).every(
+      (key) => formData[key] !== '' && !errors[key]
+    );
+
+    setIsSubmitDisabled(!formIsValid);
+  }, [formData, errors]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check if passwords match
-    if (formData.password !== formData.confirm_password) {
-      setErrors({ confirm_password: ['Passwords do not match'] });
-      return;
-    }
-
-    const { success, data, errors } = await apiCall('http://127.0.0.1:8000/api/register/', 'POST', formData);
+    // Submit form data via an API call
+    const { success, data } = await apiCall('/api/register/', 'POST', formData);
 
     if (success) {
-      setMessage('User created successfully');
+      setFormData({
+        username: '',
+        email: '',
+        password: '',
+        confirm_password: ''
+      });
       setErrors({});
+      setIsSubmitDisabled(true);
     } else {
+      // Handle server-side validation errors if any
       setErrors(data);
     }
   };
@@ -79,12 +124,13 @@ function SignUp() {
               label={field.label}
               name={field.name}
               type={field.type}
-              value={formData[field.name]}
+              value={formData[field.name]} // Use controlled input
               onChange={handleChange}
-              error={!!errors[field.name]}
-              helperText={errors[field.name]}
+              onBlur={(e) => validateField(field.name, e.target.value)} // Validate on blur as well
+              error={!!errors[field.name]} // Show error if it exists
+              helperText={errors[field.name]} // Display error message
               margin="normal"
-              required
+              required={field.required}
             />
           ))}
           <Button
@@ -92,10 +138,10 @@ function SignUp() {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
+            disabled={isSubmitDisabled} // Disable submit if form is invalid
           >
             Sign Up
           </Button>
-          {message && <Typography color="success.main">{message}</Typography>}
         </Box>
       </Box>
     </Container>
