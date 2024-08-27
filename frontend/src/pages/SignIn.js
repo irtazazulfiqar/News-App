@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { TextField, Button, Typography, Container, Box, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { apiCall } from 'utility/UseApi';
-import { useAuth } from 'context/AuthContext';
 
 // Define the config object with field properties
 const fieldConfig = {
@@ -21,7 +20,6 @@ const fieldConfig = {
 };
 
 function SignIn() {
-  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -43,7 +41,6 @@ function SignIn() {
     const { success, data, errors } = await apiCall('http://127.0.0.1:8000/api/signin/', 'POST', formData);
 
     if (success) {
-      login(data.access, data.refresh);
       setMessage('Login successful');
       setErrors({});
       setTimeout(() => {

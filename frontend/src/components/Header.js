@@ -1,10 +1,8 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography, Button, Container } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { useAuth } from 'context/AuthContext';
 
 function Header() {
-  const { isAuthenticated, logout } = useAuth();
 
   return (
     <AppBar position="static" color="primary">
@@ -14,11 +12,6 @@ function Header() {
             News App
           </Typography>
           <div>
-            {isAuthenticated ? (
-              <Button color="inherit" onClick={logout}>
-                Logout
-              </Button>
-            ) : (
               <>
                 <Button color="inherit" component={Link} to="/signin">
                   Sign In
@@ -27,7 +20,6 @@ function Header() {
                   Sign Up
                 </Button>
               </>
-            )}
           </div>
         </Toolbar>
       </Container>
