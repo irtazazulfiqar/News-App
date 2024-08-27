@@ -71,7 +71,7 @@ function SignIn() {
               value={formData[field.name]}
               onChange={handleChange}
               error={!!errors[field.name]}
-              helperText={errors[field.name] && errors[field.name]}
+              helperText={errors[field.name]}
               margin="normal"
               required={field.required}
             />
