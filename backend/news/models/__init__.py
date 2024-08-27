@@ -1,1 +1,1 @@
-from news.models.user import User
+from .user import User
