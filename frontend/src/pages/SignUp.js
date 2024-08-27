@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TextField, Button, Typography, Container, Box } from '@mui/material';
-
+import {apiCall} from 'utility/UseApi';
 // Define the config object with field properties
 const fieldConfig = {
   username: {
@@ -34,7 +34,7 @@ function SignUp() {
     username: '',
     email: '',
     password: '',
-    confirm_password: '',
+    confirm_password: ''
   });
   const [message, setMessage] = useState('');
   const [errors, setErrors] = useState({});
@@ -51,26 +51,19 @@ function SignUp() {
 
     // Check if passwords match
     if (formData.password !== formData.confirm_password) {
-      setErrors({ confirm_password: ["Passwords do not match"] });
+      setErrors({ confirm_password: ['Passwords do not match'] });
       return;
     }
 
-    const response = await fetch('http://127.0.0.1:8000/api/register/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(formData)
-    });
+    const { success, data, errors } = await apiCall('http://127.0.0.1:8000/api/register/', 'POST', formData);
 
-    const data = await response.json();
-
-    if (response.ok) {
+    if (success) {
       setMessage('User created successfully');
       setErrors({});
     } else {
       setErrors(data);
-    }  };
+    }
+  };
 
   return (
     <Container maxWidth="sm">
@@ -89,7 +82,7 @@ function SignUp() {
               value={formData[field.name]}
               onChange={handleChange}
               error={!!errors[field.name]}
-              helperText={errors[field.name] && errors[field.name]}
+              helperText={errors[field.name]}
               margin="normal"
               required
             />

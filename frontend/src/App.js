@@ -1,12 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import SignIn from './pages/SignIn';
-import SignUp from './pages/SignUp';
-import Dashboard from './pages/Dashboard';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import ProtectedRoute from './utility/protectedRoute';
-import { AuthProvider } from './context/authContext';
+import SignIn from 'pages/SignIn';
+import SignUp from 'pages/SignUp';
+import Dashboard from 'pages/Dashboard';
+import Header from 'components/Header';
+import Footer from 'components/Footer';
+import ProtectedRoute from 'utility/ProtectedRoute';
+import { AuthProvider } from 'context/AuthContext';
 
 function App() {
   return (
