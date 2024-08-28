@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, Typography, Container, Box } from '@mui/material';
+import { TextField, Button, Typography, Container, Box, Alert } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import { apiCall } from 'utils/useAPI';
+import { useAuth } from 'context/AuthContext';
 
+// Define the config object with field properties and validation logic
 const fieldConfig = {
-  username: {
-    label: 'Username',
-    name: 'username',
-    type: 'text',
-    required: true,
-    validate: (value) => value.length > 2 || 'Username must be at least 3 characters long',
-  },
   email: {
     label: 'Email',
     name: 'email',
@@ -25,27 +21,19 @@ const fieldConfig = {
     required: true,
     validate: (value) => value.length >= 8 || 'Password must be at least 8 characters long',
   },
-  confirm_password: {
-    label: 'Confirm Password',
-    name: 'confirm_password',
-    type: 'password',
-    required: true,
-    validate: (value, formData) =>
-      value === formData.password || 'Passwords do not match',
-  },
 };
 
-function SignUp() {
+function SignIn() {
+  const { login } = useAuth();
+
   const [formData, setFormData] = useState({
-    username: '',
     email: '',
     password: '',
-    confirm_password: '',
   });
-
-  const [message, setMessage] = useState('');
   const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState('');
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -55,7 +43,12 @@ function SignUp() {
       [name]: value,
     }));
 
+    // Validate the field on change
     validateField(name, value);
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const validateField = (name, value) => {
@@ -65,21 +58,23 @@ function SignUp() {
     if (field.required && !value) {
       error = `${field.label} is required`;
     } else if (field.validate) {
-      const validationResult = field.validate(value, formData);
+      const validationResult = field.validate(value);
       if (typeof validationResult === 'string') {
         error = validationResult;
       }
     }
 
+    // Update the error state
     setErrors((prevErrors) => ({
       ...prevErrors,
-      [name]: error ? [error] : [],
+      [name]: error,
     }));
   };
 
+  // Validate the form and enable/disable the submit button
   useEffect(() => {
     const formIsValid = Object.keys(fieldConfig).every(
-      (key) => formData[key] !== '' && !errors[key]?.length
+      (key) => formData[key] !== '' && !errors[key]
     );
 
     setIsSubmitDisabled(!formIsValid);
@@ -88,25 +83,17 @@ function SignUp() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { success, data, errors: apiErrors } = await apiCall('/api/register/', 'POST', formData);
+    const { success, data, errors: serverErrors } = await apiCall('/api/signin/', 'POST', formData);
 
     if (success) {
-      setFormData({
-        username: '',
-        email: '',
-        password: '',
-        confirm_password: '',
-      });
+      login(data.access, data.refresh);
+      setMessage('Login successful');
       setErrors({});
-      setMessage('Successfully signed up');
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 1000);
     } else {
-      // Normalize the errors into an object with arrays for each field
-      const normalizedErrors = Object.keys(apiErrors).reduce((acc, key) => {
-        acc[key] = Array.isArray(apiErrors[key]) ? apiErrors[key] : [apiErrors[key]];
-        return acc;
-      }, {});
-
-      setErrors(normalizedErrors);
+      setErrors(serverErrors || {});
     }
   };
 
@@ -114,7 +101,7 @@ function SignUp() {
     <Container maxWidth="sm">
       <Box sx={{ marginTop: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <Typography component="h1" variant="h5">
-          Sign Up
+          Sign In
         </Typography>
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
           {Object.values(fieldConfig).map((field) => (
@@ -124,11 +111,11 @@ function SignUp() {
               label={field.label}
               name={field.name}
               type={field.type}
-              value={formData[field.name] || ''} // Ensure default value is empty string
+              value={formData[field.name]}
               onChange={handleChange}
-              onBlur={(e) => validateField(field.name, e.target.value)} // Validate on blur as well
-              error={!!errors[field.name] && errors[field.name].length > 0} // Show error if it exists
-              helperText={errors[field.name]?.join(', ') || ''} // Display error messages, joined by commas
+              onBlur={(e) => validateField(field.name, e.target.value)}
+              error={!!errors[field.name]}
+              helperText={errors[field.name]}
               margin="normal"
               required={field.required}
             />
@@ -138,16 +125,19 @@ function SignUp() {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
-            disabled={isSubmitDisabled} // Disable submit if form is invalid
+            disabled={isSubmitDisabled}
           >
-            Sign Up
+            Sign In
           </Button>
-          {message && <Typography color="success.main">{message}</Typography>}
-          {/* Display general errors if any */}
-          {Object.keys(errors).length > 0 && !Object.values(errors).some(errs => errs.length > 0) && (
-            <Typography color="error.main">
-              {Object.values(errors).flat().join(', ')}
-            </Typography>
+          {message && (
+            <Alert severity="success" style={{ marginTop: '20px' }}>
+              {message}
+            </Alert>
+          )}
+          {Object.keys(errors).length > 0 && (
+            <Alert severity="error" style={{ marginTop: '20px' }}>
+              Please check the fields and try again.
+            </Alert>
           )}
         </Box>
       </Box>
@@ -155,4 +145,4 @@ function SignUp() {
   );
 }
 
-export default SignUp;
+export default SignIn;
