@@ -8,7 +8,7 @@ function Dashboard() {
         Welcome to the Dashboard!
       </Typography>
       <Typography variant="body1">
-        Welcome to Dashboard.
+        Here you can manage your profile, view data, and much more.
       </Typography>
     </Container>
   );
