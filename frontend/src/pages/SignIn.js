@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { apiCall } from 'utils/useAPI';
 import { useAuth } from 'context/AuthContext';
 
-// Define the config object with field properties
+// Define the config object with field properties and validation logic
 const fieldConfig = {
   email: {
     label: 'Email',
@@ -25,6 +25,7 @@ const fieldConfig = {
 
 function SignIn() {
   const { login } = useAuth();
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
