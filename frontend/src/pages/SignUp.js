@@ -100,8 +100,6 @@ function SignUp() {
       setErrors({});
       setMessage('Successfully signed up');
     } else {
-      console.log('API Errors:', apiErrors);
-
       // Normalize the errors into an object with arrays for each field
       const normalizedErrors = Object.keys(apiErrors).reduce((acc, key) => {
         acc[key] = Array.isArray(apiErrors[key]) ? apiErrors[key] : [apiErrors[key]];
