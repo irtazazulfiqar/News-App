@@ -1,3 +1,5 @@
+const backendBaseUrl = process.env.REACT_APP_BACKEND_BASE_URL;
+
 export const apiCallWithAuth = async (url, method = 'GET', body = null) => {
   const accessToken = localStorage.getItem('access_token');
 
@@ -14,7 +16,7 @@ export const apiCallWithAuth = async (url, method = 'GET', body = null) => {
   }
 
   try {
-    const response = await fetch(url, options);
+    const response = await fetch(`${backendBaseUrl}${url}`, options);
     const data = await response.json();
 
     if (response.ok) {
@@ -37,7 +39,7 @@ export const apiCallWithAuth = async (url, method = 'GET', body = null) => {
 
 export const refreshAccessToken = async (refreshToken) => {
   try {
-    const response = await fetch('http://127.0.0.1:8000/api/token/refresh/', {
+    const response = await fetch(`${backendBaseUrl}/api/token/refresh/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
