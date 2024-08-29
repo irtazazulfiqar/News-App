@@ -23,7 +23,7 @@ const fieldConfig = {
     name: 'password',
     type: 'password',
     required: true,
-    validate: (value) => value.length >= 6 || 'Password must be at least 6 characters long',
+    validate: (value) => value.length >= 8 || 'Password must be at least 8 characters long',
   },
   confirm_password: {
     label: 'Confirm Password',
@@ -40,12 +40,13 @@ function SignUp() {
     username: '',
     email: '',
     password: '',
-    confirm_password: ''
+    confirm_password: '',
   });
+
+  const [message, setMessage] = useState('');
   const [errors, setErrors] = useState({});
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
 
-  // Handle field change and validate real-time
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -54,11 +55,9 @@ function SignUp() {
       [name]: value,
     }));
 
-    // Validate immediately after change
     validateField(name, value);
   };
 
-  // Validate individual fields
   const validateField = (name, value) => {
     const field = fieldConfig[name];
     let error = '';
@@ -72,18 +71,15 @@ function SignUp() {
       }
     }
 
-    // Set the error state
     setErrors((prevErrors) => ({
       ...prevErrors,
-      [name]: error,
+      [name]: error ? [error] : [],
     }));
   };
 
-  // Validate the entire form and enable/disable the submit button
   useEffect(() => {
-    // Check if all fields are valid
     const formIsValid = Object.keys(fieldConfig).every(
-      (key) => formData[key] !== '' && !errors[key]
+      (key) => formData[key] !== '' && !errors[key]?.length
     );
 
     setIsSubmitDisabled(!formIsValid);
@@ -92,21 +88,25 @@ function SignUp() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Submit form data via an API call
-    const { success, data } = await apiCall('/api/register/', 'POST', formData);
+    const { success, data, errors: apiErrors } = await apiCall('/api/register/', 'POST', formData);
 
     if (success) {
       setFormData({
         username: '',
         email: '',
         password: '',
-        confirm_password: ''
+        confirm_password: '',
       });
       setErrors({});
-      setIsSubmitDisabled(true);
+      setMessage('Successfully signed up');
     } else {
-      // Handle server-side validation errors if any
-      setErrors(data);
+      // Normalize the errors into an object with arrays for each field
+      const normalizedErrors = Object.keys(apiErrors).reduce((acc, key) => {
+        acc[key] = Array.isArray(apiErrors[key]) ? apiErrors[key] : [apiErrors[key]];
+        return acc;
+      }, {});
+
+      setErrors(normalizedErrors);
     }
   };
 
@@ -124,11 +124,11 @@ function SignUp() {
               label={field.label}
               name={field.name}
               type={field.type}
-              value={formData[field.name]} // Use controlled input
+              value={formData[field.name] || ''} // Ensure default value is empty string
               onChange={handleChange}
               onBlur={(e) => validateField(field.name, e.target.value)} // Validate on blur as well
-              error={!!errors[field.name]} // Show error if it exists
-              helperText={errors[field.name]} // Display error message
+              error={!!errors[field.name] && errors[field.name].length > 0} // Show error if it exists
+              helperText={errors[field.name]?.join(', ') || ''} // Display error messages, joined by commas
               margin="normal"
               required={field.required}
             />
@@ -142,6 +142,13 @@ function SignUp() {
           >
             Sign Up
           </Button>
+          {message && <Typography color="success.main">{message}</Typography>}
+          {/* Display general errors if any */}
+          {Object.keys(errors).length > 0 && !Object.values(errors).some(errs => errs.length > 0) && (
+            <Typography color="error.main">
+              {Object.values(errors).flat().join(', ')}
+            </Typography>
+          )}
         </Box>
       </Box>
     </Container>

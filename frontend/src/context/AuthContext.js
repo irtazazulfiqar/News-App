@@ -13,21 +13,13 @@ export function AuthProvider({ children }) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Check if token is present in localStorage
     const token = localStorage.getItem('access_token');
     if (token) {
-      // Use apiCall to verify token
-      apiCall('/api/token/verify/', 'POST', { token })
-        .then(response => {
-          if (response.success) {
-            setIsAuthenticated(true);
-          } else {
-            setIsAuthenticated(false);
-          }
-        })
-        .catch(() => {
-          setIsAuthenticated(false);
-        });
+      // Token is present, assume authenticated
+      setIsAuthenticated(true);
     } else {
+      // Token is not present, not authenticated
       setIsAuthenticated(false);
     }
   }, []);

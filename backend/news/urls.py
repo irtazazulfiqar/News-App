@@ -7,6 +7,7 @@ from rest_framework_simplejwt.views import (
 )
 from news.api.article import ArticleListByDateView, ArticleDateListView
 
+
 urlpatterns = [
     path('register/', RegisterUserView.as_view(), name='register'),
     path('signin/', LoginUserView.as_view(), name='signin'),

@@ -18,6 +18,9 @@ function App() {
         <Routes>
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/dashboard" element={
+            <ProtectedRoute element={<Dashboard />} />
+          } />
         </Routes>
         <Footer />
       </AuthProvider>
