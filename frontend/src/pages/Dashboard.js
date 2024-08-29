@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Typography, Card, CardContent, CardMedia, Grid, Pagination } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { apiCallWithAuth } from '../utility/AuthApi';
-import ArticleCalendar from '../components/Calender';
+import { apiCallWithAuth } from 'utils/authAPI';
+import ArticleCalendar from 'components/Calender';
 import { format } from 'date-fns';
 
 function Dashboard() {

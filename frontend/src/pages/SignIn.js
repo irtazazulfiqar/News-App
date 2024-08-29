@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Container, TextField, Button, Typography, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { apiCall } from '../utility/UseApi';
-import { useAuth } from '../context/AuthContext';
+import { apiCall } from 'utils/useAPI';
+import { useAuth } from 'context/AuthContext';
 
 function SignIn() {
       const { login } = useAuth();

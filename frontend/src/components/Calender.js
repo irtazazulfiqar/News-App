@@ -3,7 +3,7 @@ import { Box, Typography, TextField } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { apiCallWithAuth } from '../utility/AuthApi';
+import { apiCallWithAuth } from 'utils/authAPI';
 import { format, isAfter, isSameDay, parseISO } from 'date-fns';
 
 const ArticleCalendar = ({ onDateChange }) => {
