@@ -6,7 +6,7 @@ import Dashboard from 'pages/Dashboard';
 import ArticleDetails from 'pages/ArticleDetails';
 import Header from 'components/Header';
 import Footer from 'components/Footer';
-//import ProtectedRoute from 'utils/ProtectedRoute';
+import ProtectedRoute from 'utils/ProtectedRoute';
 import { AuthProvider } from 'context/AuthContext';
 import { Box, Container } from '@mui/material';
 
@@ -22,8 +22,7 @@ function App() {
             <ProtectedRoute element={<Dashboard />} />
           } />
         </Routes>
-        <Footer />
-      </AuthProvider>
+       </AuthProvider>
     </Router>
   );
 }

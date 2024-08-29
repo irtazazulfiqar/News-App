@@ -5,12 +5,22 @@ export const apiCall = async (url, method = 'POST', body) => {
       headers: {
         'Content-Type': 'application/json',
       },
-      data: body,
+      body: JSON.stringify(body),
     });
 
-    return { success: true, data: response.data };
+    console.log(response);
+    // Check if the response status is OK (status code 200-299)
+    if (!response.ok) {
+      const errorData = await response.json();
+      return { success: false, errors: errorData };
+    }
+
+    // Parse the JSON response
+    const data = await response.json();
+    return { success: true, data };
   } catch (error) {
-    const errors = error.response ? error.response.data : { general: ['An error occurred'] };
-    return { success: false, errors };
+    // Handle network or unexpected errors
+    console.error('API call error:', error);
+    return { success: false, errors: { general: ['An error occurred'] } };
   }
 };
