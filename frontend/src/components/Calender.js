@@ -3,7 +3,7 @@ import { Box, Typography, TextField } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { apiCallWithAuth } from 'utils/authAPI';
+import axios from 'axios';
 import { format, isAfter, isSameDay, parseISO } from 'date-fns';
 
 const ArticleCalendar = ({ onDateChange }) => {
@@ -13,12 +13,13 @@ const ArticleCalendar = ({ onDateChange }) => {
   useEffect(() => {
     const fetchDates = async () => {
       try {
-        const response = await apiCallWithAuth('/api/article-dates/');
-        if (response.success) {
+        const response = await axios('/api/article-dates');
+        if (response.status === 200) {
+          // Ensure dates are parsed correctly as Date objects
           const dates = response.data.dates.map(date => parseISO(date));
           setArticleDates(dates);
         } else {
-          console.error('Error fetching article dates:', response.errors);
+          console.error('Error fetching article dates:', response.data.errors);
         }
       } catch (error) {
         console.error('Error fetching article dates:', error);
@@ -30,7 +31,7 @@ const ArticleCalendar = ({ onDateChange }) => {
 
   useEffect(() => {
     if (selectedDate) {
-    // Notify the parent component of the selected date change i.e (Dashboard.js)
+      // Notify the parent component of the selected date change
       onDateChange(selectedDate);
     }
   }, [selectedDate, onDateChange]);

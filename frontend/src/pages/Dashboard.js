@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Typography, Card, CardContent, CardMedia, Grid, Pagination } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { apiCallWithAuth } from 'utils/authAPI';
+import axios from 'axios';
 import ArticleCalendar from 'components/Calender';
 import { format } from 'date-fns';
 
@@ -14,41 +14,40 @@ function Dashboard() {
   const [totalPages, setTotalPages] = useState(1);
   const [selectedDate, setSelectedDate] = useState(new Date()); // Default to current date
 
-useEffect(() => {
-  const fetchArticles = async () => {
-    const formattedDate = format(selectedDate, 'yyyy-MM-dd'); // Format the date
-    const articlesPerPage = 6;
+  useEffect(() => {
+    const fetchArticles = async () => {
+      const formattedDate = format(selectedDate, 'yyyy-MM-dd'); // Format the date
+      const articlesPerPage = 6;
 
-    try {
-      const result = await apiCallWithAuth(`/api/articles/?date=${formattedDate}`);
+      try {
+        const { data } = await axios.get(`/api/articles/?date=${formattedDate}`);
+        console.log(data);
 
-      if (result.success) {
-        // Reset pagination state
-        setPage(1); // Reset page to 1 when date changes
-        setTotalPages(Math.ceil(result.data.results.length / articlesPerPage));
+        // Assuming a successful response has a "results" array
+        if (data && data.results) {
+          setPage(1); // Reset page to 1 when date changes
+          setTotalPages(Math.ceil(data.results.length / articlesPerPage));
 
-        // Update articles and displayed articles
-        setArticles(result.data.results);
-        setDisplayedArticles(result.data.results.slice(0, articlesPerPage));
-      } else {
-        setError(result.errors);
+          setArticles(data.results);
+          setDisplayedArticles(data.results.slice(0, articlesPerPage));
+        } else {
+          setError('Unexpected response structure');
+        }
+      } catch (err) {
+        setError('Failed to fetch articles');
+        console.error(err);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      setError({ error: 'Something went wrong' });
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  fetchArticles();
-}, [selectedDate]); // Depend only on selectedDate for pagination reset
-
+    fetchArticles();
+  }, [selectedDate]);
 
   useEffect(() => {
-    // Update displayed articles when the page changes
     const articlesPerPage = 6;
     setDisplayedArticles(articles.slice((page - 1) * articlesPerPage, page * articlesPerPage));
-  }, [page, articles]); // Depend on both page and articles
+  }, [page, articles]);
 
   const handlePageChange = (event, value) => {
     setPage(value);
@@ -73,7 +72,7 @@ useEffect(() => {
         <Typography variant="body1">Loading...</Typography>
       ) : error ? (
         <Typography variant="body1" color="error">
-          Error: {error.error || 'An unexpected error occurred'}
+          Error: {error}
         </Typography>
       ) : (
         <>
