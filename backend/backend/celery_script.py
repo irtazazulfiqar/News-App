@@ -6,8 +6,9 @@ from news.models.article import Article
 
 
 class ArticleScraper:
-    def __init__(self, start_url, target_date=None):
-        self.start_url = start_url
+    START_URL = 'https://www.thenews.com.pk/'
+
+    def __init__(self, target_date=None):
         self.target_date = target_date or datetime.today().strftime('%B %d, %Y')
 
     @staticmethod
@@ -180,7 +181,7 @@ class ArticleScraper:
         return links
 
     def crawl(self):
-        soup = self.fetch_and_parse(self.start_url)
+        soup = self.fetch_and_parse(self.START_URL)
         links = self.find_links(soup)
         for link in links:
             page_soup = self.fetch_and_parse(link)
