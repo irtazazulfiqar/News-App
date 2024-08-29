@@ -17,7 +17,7 @@ function Dashboard() {
 useEffect(() => {
   const fetchArticles = async () => {
     const formattedDate = format(selectedDate, 'yyyy-MM-dd'); // Format the date
-    const articlesPerPage = 6;
+    const articlesPerPage = 10;
 
     try {
       const result = await apiCallWithAuth(`/api/articles/?date=${formattedDate}`);
@@ -46,7 +46,7 @@ useEffect(() => {
 
   useEffect(() => {
     // Update displayed articles when the page changes
-    const articlesPerPage = 6;
+    const articlesPerPage = 10;
     setDisplayedArticles(articles.slice((page - 1) * articlesPerPage, page * articlesPerPage));
   }, [page, articles]); // Depend on both page and articles
 

@@ -13,5 +13,5 @@ urlpatterns = [
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view, name='token_refresh'),
     path('articles/', ArticleListByDateView.as_view(), name='articles_by_date'),
-    path('article-dates/', ArticleDateListView.as_view(), name='article-date-list'),
+    path('articles/dates/', ArticleDateListView.as_view(), name='article-date-list'),
 ]

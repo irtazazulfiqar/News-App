@@ -1,9 +1,11 @@
+from datetime import datetime
+
 from rest_framework import generics, status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from news.models.article import Article
-from news.serializers.article import (ArticleSerializer, DateValidatorSerializer,
+from news.serializers.article import (ArticleSerializer,
                                       ArticleDateSerializer)
 
 
@@ -21,12 +23,10 @@ class ArticleListByDateView(generics.ListAPIView):
         # Get the date from query params
         date_str = self.request.query_params.get('date')
 
-        # Validate the date using the DateValidatorSerializer
-        serializer = DateValidatorSerializer(data={'date': date_str})
-        if not serializer.is_valid():
-            # Return a response with validation errors if date is invalid
-            return Response({'error': serializer.errors},
-                            status=status.HTTP_400_BAD_REQUEST)
+        try:
+            date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        except (TypeError, ValueError):
+            return Response({'error': 'Invalid date format'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Get filtered articles using the custom method in Article Model
         return Article.get_filtered_articles(date_str)
