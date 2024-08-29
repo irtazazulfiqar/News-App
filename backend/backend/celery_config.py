@@ -16,7 +16,7 @@ app.autodiscover_tasks()
 
 # This will make sure the app is always imported when Django starts
 # so that shared_task will use this app.
-from . import celery_config
+from backend import celery_config
 celery_config.app = app
 
 __all__ = ('app',)
