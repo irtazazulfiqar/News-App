@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import SignIn from 'pages/SignIn';
 import SignUp from 'pages/SignUp';
 import Dashboard from 'pages/Dashboard';
-import ArticleDetails from 'pages/ArticleDetails';
 import Header from 'components/Header';
 import Footer from 'components/Footer';
 import ProtectedRoute from 'utils/ProtectedRoute';
