@@ -13,3 +13,4 @@ function ProtectedRoute({ element, ...rest }) {
 }
 
 export default ProtectedRoute;
+

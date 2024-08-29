@@ -1,4 +1,8 @@
 backend/.env
+backend/dump.rdb
+backend/celerybeat-schedule.db
+/dump.rdb
+frontend/dump.rdb
 
 # Virtual Enviornment
 .venv

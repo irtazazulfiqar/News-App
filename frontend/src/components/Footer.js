@@ -8,9 +8,10 @@ function Footer() {
       sx={{
         py: 3,
         px: 2,
-        mt: 'auto',
         backgroundColor: (theme) => theme.palette.primary.main,
         color: 'white',
+        textAlign: 'center', // Center align text
+        mb: 'auto', // Push the footer to the bottom if content is not enough
       }}
     >
       <Container maxWidth="lg">
@@ -18,7 +19,9 @@ function Footer() {
           &copy; {new Date().getFullYear()} My Website
         </Typography>
       </Container>
+
     </Box>
+
   );
 }
 

@@ -195,3 +195,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 DATABASE_ROUTERS = ['backend.db_router.DatabaseRouter']
 
 AUTH_USER_MODEL = 'news.User'
+
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')  # Use your Redis URL
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND')  # Use your Redis URL
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
+
+CELERY_BEAT_SCHEDULE = {
+    'add-every-3-minutes': {
+        'task': 'news.tasks.run_scraper',
+        'schedule': 180.0,  # 180 seconds = 3 minutes
+    },
+}
