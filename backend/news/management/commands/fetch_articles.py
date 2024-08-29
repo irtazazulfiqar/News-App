@@ -26,9 +26,8 @@ class Command(BaseCommand):
         # Pass the date objects directly to the fetch_articles_by_date_range function
         articles = Article.fetch_articles_by_date_range(start_date, end_date)
 
-        # Print the details of the fetched articles
+        # Print the total number of the fetched articles
         if articles:
-            for article in articles:
-                self.stdout.write(self.style.SUCCESS(f"Article: {article.post_title}, Published on: {article.published_date}"))
+            self.stdout.write(self.style.SUCCESS(f"Total articles fetched: {len(articles)}"))
         else:
             self.stdout.write(self.style.WARNING("No articles found for the given date range."))
