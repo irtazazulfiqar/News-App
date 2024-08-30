@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Typography, Card, CardContent, CardMedia, Grid, Pagination } from '@mui/material';
+import { Container, Typography, Card, CardContent, CardMedia, Grid, Pagination, TextField } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { apiCallWithAuth } from 'utils/authAPI';
 import ArticleCalendar from 'components/Calender';
@@ -7,29 +7,21 @@ import { format } from 'date-fns';
 
 function Dashboard() {
   const [articles, setArticles] = useState([]);
-  const [displayedArticles, setDisplayedArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedDate, setSelectedDate] = useState(new Date()); // Default to current date
+  const [pageSize, setPageSize] = useState(10); // Default page size
 
-useEffect(() => {
-  const fetchArticles = async () => {
-    const formattedDate = format(selectedDate, 'yyyy-MM-dd'); // Format the date
-    const articlesPerPage = 10;
-
+  const fetchArticles = async (url) => {
     try {
-      const result = await apiCallWithAuth(`/api/articles/?date=${formattedDate}`);
+      const result = await apiCallWithAuth(url);
 
       if (result.success) {
-        // Reset pagination state
-        setPage(1); // Reset page to 1 when date changes
-        setTotalPages(Math.ceil(result.data.results.length / articlesPerPage));
-
-        // Update articles and displayed articles
-        setArticles(result.data.results);
-        setDisplayedArticles(result.data.results.slice(0, articlesPerPage));
+        const data = result.data;
+        setArticles(data.results);
+        setTotalPages(Math.ceil(data.count / pageSize)); // Calculate total pages based on the count and page size
       } else {
         setError(result.errors);
       }
@@ -40,27 +32,27 @@ useEffect(() => {
     }
   };
 
-  fetchArticles();
-}, [selectedDate]); // Depend only on selectedDate for pagination reset
-
-
   useEffect(() => {
-    // Update displayed articles when the page changes
-    const articlesPerPage = 10;
-    setDisplayedArticles(articles.slice((page - 1) * articlesPerPage, page * articlesPerPage));
-  }, [page, articles]); // Depend on both page and articles
+    const formattedDate = format(selectedDate, 'yyyy-MM-dd'); // Format the date
+    const initialUrl = `/api/articles/?date=${formattedDate}&page=${page}&page_size=${pageSize}`;
+    // Fetch articles when the component mounts and when `page`, `selectedDate`, or `pageSize` changes
+    fetchArticles(initialUrl);
+  }, [selectedDate, page, pageSize]);
 
   const handlePageChange = (event, value) => {
-    setPage(value);
+    setPage(value); // Update the page state, triggering a new API call
   };
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
-    if (date !== selectedDate){
-    // Reset to page 1 when the date changes but only if selected-date and
-    // current date are not equal
-        setPage(1);
-    }
+    setPage(1); // Reset to page 1 when the date changes
+    setArticles([]);
+  };
+
+  const handlePageSizeChange = (event) => {
+    setPageSize(Number(event.target.value)); // Update page size state
+    setPage(1); // Reset to page 1 when page size changes
+    setArticles([]);
   };
 
   return (
@@ -69,6 +61,14 @@ useEffect(() => {
         Latest News
       </Typography>
       <ArticleCalendar onDateChange={handleDateChange} />
+      <TextField
+        label="Page Size"
+        type="number"
+        value={pageSize}
+        onChange={handlePageSizeChange}
+        inputProps={{ min: 1, max: 100 }}
+        style={{ marginBottom: 20 }}
+      />
       {loading ? (
         <Typography variant="body1">Loading...</Typography>
       ) : error ? (
@@ -77,11 +77,11 @@ useEffect(() => {
         </Typography>
       ) : (
         <>
-          {displayedArticles.length === 0 && !loading && (
+          {articles.length === 0 && !loading && (
             <Typography variant="body1">No articles available</Typography>
           )}
           <Grid container spacing={3}>
-            {displayedArticles.map((article) => (
+            {articles.map((article) => (
               <Grid item xs={12} sm={6} md={4} key={article.post_title}>
                 <Link
                   to={`/articles/${encodeURIComponent(article.post_title)}`}
