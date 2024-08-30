@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Typography, Card, CardContent, CardMedia, Grid, Pagination, TextField } from '@mui/material';
+import { Container, Typography, Card, CardContent, CardMedia, Grid, TablePagination } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { apiCallWithAuth } from 'utils/authAPI';
 import ArticleCalendar from 'components/Calender';
@@ -9,19 +9,21 @@ function Dashboard() {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [page, setPage] = useState(0);  // MUI pagination starts from 0
+  const [totalPages, setTotalPages] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);  // Default page size
   const [selectedDate, setSelectedDate] = useState(new Date()); // Default to current date
-  const [pageSize, setPageSize] = useState(10); // Default page size
 
-  const fetchArticles = async (url) => {
+  const fetchArticles = async (page, rowsPerPage) => {
     try {
+      const formattedDate = format(selectedDate, 'yyyy-MM-dd');
+      const url = `/api/articles/?date=${formattedDate}&page=${page + 1}&page_size=${rowsPerPage}`;
       const result = await apiCallWithAuth(url);
 
       if (result.success) {
         const data = result.data;
         setArticles(data.results);
-        setTotalPages(Math.ceil(data.count / pageSize)); // Calculate total pages based on the count and page size
+        setTotalPages(Math.ceil(data.count / rowsPerPage)); // Calculate total pages based on the count and page size
       } else {
         setError(result.errors);
       }
@@ -33,42 +35,31 @@ function Dashboard() {
   };
 
   useEffect(() => {
-    const formattedDate = format(selectedDate, 'yyyy-MM-dd'); // Format the date
-    const initialUrl = `/api/articles/?date=${formattedDate}&page=${page}&page_size=${pageSize}`;
-    // Fetch articles when the component mounts and when `page`, `selectedDate`, or `pageSize` changes
-    fetchArticles(initialUrl);
-  }, [selectedDate, page, pageSize]);
+    fetchArticles(page, rowsPerPage);
+  }, [selectedDate, page, rowsPerPage]);
 
-  const handlePageChange = (event, value) => {
-    setPage(value); // Update the page state, triggering a new API call
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage); // Update the page state, triggering a new API call
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10)); // Update the rows per page
+    setPage(0); // Reset to page 0 when the page size changes
   };
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
-    setPage(1); // Reset to page 1 when the date changes
-    setArticles([]);
-  };
-
-  const handlePageSizeChange = (event) => {
-    setPageSize(Number(event.target.value)); // Update page size state
-    setPage(1); // Reset to page 1 when page size changes
+    setPage(0); // Reset to page 0 when the date changes
     setArticles([]);
   };
 
   return (
     <Container maxWidth="md">
       <Typography variant="h3" gutterBottom>
-        Latest News
+        News
       </Typography>
       <ArticleCalendar onDateChange={handleDateChange} />
-      <TextField
-        label="Page Size"
-        type="number"
-        value={pageSize}
-        onChange={handlePageSizeChange}
-        inputProps={{ min: 1, max: 100 }}
-        style={{ marginBottom: 20 }}
-      />
+
       {loading ? (
         <Typography variant="body1">Loading...</Typography>
       ) : error ? (
@@ -77,6 +68,20 @@ function Dashboard() {
         </Typography>
       ) : (
         <>
+          <TablePagination
+              component="div"
+              count={totalPages * rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              style={{ marginBottom: 20, marginLeft: 0 }}
+              sx={{
+                display: 'flex',
+                justifyContent: 'flex-start'
+              }}
+           />
+
           {articles.length === 0 && !loading && (
             <Typography variant="body1">No articles available</Typography>
           )}
@@ -108,15 +113,6 @@ function Dashboard() {
               </Grid>
             ))}
           </Grid>
-          {totalPages > 1 && (
-            <Pagination
-              count={totalPages}
-              page={page}
-              onChange={handlePageChange}
-              color="primary"
-              style={{ marginTop: 20 }}
-            />
-          )}
         </>
       )}
     </Container>
