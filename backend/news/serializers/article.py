@@ -11,10 +11,6 @@ class ArticleSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class DateValidatorSerializer(serializers.Serializer):
-    date = serializers.DateField(input_formats=['%Y-%m-%d'])
-
-
 class ArticleDateSerializer(serializers.Serializer):
     dates = serializers.ListField(
         child=serializers.DateField(),

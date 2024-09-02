@@ -1,74 +1,84 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Typography, Card, CardContent, CardMedia, Grid, Pagination } from '@mui/material';
+import { Container, Typography, Card, CardContent, CardMedia, Grid, TablePagination } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { apiCallWithAuth } from 'utils/authAPI';
 import ArticleCalendar from 'components/Calender';
 import { format } from 'date-fns';
+import axios from 'axios';
 
 function Dashboard() {
   const [articles, setArticles] = useState([]);
-  const [displayedArticles, setDisplayedArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [selectedDate, setSelectedDate] = useState(new Date()); // Default to current date
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [cancelTokenSource, setCancelTokenSource] = useState(null);
 
-useEffect(() => {
-  const fetchArticles = async () => {
-    const formattedDate = format(selectedDate, 'yyyy-MM-dd'); // Format the date
-    const articlesPerPage = 6;
+  const fetchArticles = async (page, rowsPerPage) => {
+    if (cancelTokenSource) {
+      cancelTokenSource.cancel('Operation canceled due to new request.');
+    }
+    const source = axios.CancelToken.source();
+    setCancelTokenSource(source);
 
     try {
-      const result = await apiCallWithAuth(`/api/articles/?date=${formattedDate}`);
+      const formattedDate = format(selectedDate, 'yyyy-MM-dd');
+      const url = `/api/articles/?date=${formattedDate}&page=${page + 1}&page_size=${rowsPerPage}`;
+      const result = await apiCallWithAuth(url, 'GET', null, source.token);
 
       if (result.success) {
-        // Reset pagination state
-        setPage(1); // Reset page to 1 when date changes
-        setTotalPages(Math.ceil(result.data.results.length / articlesPerPage));
-
-        // Update articles and displayed articles
-        setArticles(result.data.results);
-        setDisplayedArticles(result.data.results.slice(0, articlesPerPage));
+        const data = result.data;
+        setArticles(data.results);
+        setTotalPages(Math.ceil(data.count / rowsPerPage));
       } else {
         setError(result.errors);
       }
     } catch (error) {
-      setError({ error: 'Something went wrong' });
+      if (axios.isCancel(error)) {
+        // Handle request cancellation
+        setError({ error: 'Request Cancelled' });
+      } else {
+        setError({ error: 'Something went wrong' });
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  fetchArticles();
-}, [selectedDate]); // Depend only on selectedDate for pagination reset
-
-
   useEffect(() => {
-    // Update displayed articles when the page changes
-    const articlesPerPage = 6;
-    setDisplayedArticles(articles.slice((page - 1) * articlesPerPage, page * articlesPerPage));
-  }, [page, articles]); // Depend on both page and articles
+    fetchArticles(page, rowsPerPage);
+    // Clean up function to cancel ongoing requests on component unmount
+    return () => {
+      if (cancelTokenSource) {
+        cancelTokenSource.cancel('Component unmounted');
+      }
+    };
+  }, [selectedDate, page, rowsPerPage]);
 
-  const handlePageChange = (event, value) => {
-    setPage(value);
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
   };
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
-    if (date !== selectedDate){
-    // Reset to page 1 when the date changes but only if selected-date and
-    // current date are not equal
-        setPage(1);
-    }
+    setPage(0);
+    setArticles([]);
   };
 
   return (
     <Container maxWidth="md">
       <Typography variant="h3" gutterBottom>
-        Latest News
+        News
       </Typography>
       <ArticleCalendar onDateChange={handleDateChange} />
+
       {loading ? (
         <Typography variant="body1">Loading...</Typography>
       ) : error ? (
@@ -77,11 +87,25 @@ useEffect(() => {
         </Typography>
       ) : (
         <>
-          {displayedArticles.length === 0 && !loading && (
+          <TablePagination
+            component="div"
+            count={totalPages * rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            style={{ marginBottom: 20, marginLeft: 0 }}
+            sx={{
+              display: 'flex',
+              justifyContent: 'flex-start'
+            }}
+          />
+
+          {articles.length === 0 && !loading && (
             <Typography variant="body1">No articles available</Typography>
           )}
           <Grid container spacing={3}>
-            {displayedArticles.map((article) => (
+            {articles.map((article) => (
               <Grid item xs={12} sm={6} md={4} key={article.post_title}>
                 <Link
                   to={`/articles/${encodeURIComponent(article.post_title)}`}
@@ -108,15 +132,6 @@ useEffect(() => {
               </Grid>
             ))}
           </Grid>
-          {totalPages > 1 && (
-            <Pagination
-              count={totalPages}
-              page={page}
-              onChange={handlePageChange}
-              color="primary"
-              style={{ marginTop: 20 }}
-            />
-          )}
         </>
       )}
     </Container>
