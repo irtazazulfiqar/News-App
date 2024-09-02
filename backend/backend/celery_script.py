@@ -42,6 +42,9 @@ class ArticleScraper:
 
     @staticmethod
     def extract_post_date(post_soup):
+        if post_soup is None:
+            return 'No date'
+
         detail_left_tittle = post_soup.find('div', class_='detail-left-tittle')
         if detail_left_tittle:
             date_tag = detail_left_tittle.find('div', class_='category-date')
