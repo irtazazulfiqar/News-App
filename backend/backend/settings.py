@@ -69,7 +69,7 @@ REST_FRAMEWORK = {
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
 
     # Exception handling
-    'EXCEPTION_HANDLER': 'rest_framework.api.exception_handler',
+    'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler',
 
 }
 
@@ -85,7 +85,13 @@ MIDDLEWARE = [
 ]
 
 # For development purposes only
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False
+
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
+
 
 CORS_ALLOW_HEADERS = [
     'content-type',
@@ -105,12 +111,17 @@ CORS_ALLOW_METHODS = [
 
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=2),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': False,
     'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'VERIFYING_KEY': None,
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
+
 
 ROOT_URLCONF = 'backend.urls'
 
@@ -146,10 +157,11 @@ DATABASES = {
     },
     'mongodb': {
         'ENGINE': 'djongo',
-        'NAME': os.getenv('MONGO_DB_NAME'),
+        'NAME': os.getenv('MONGO_DB_NAME'),  # MongoDB database name
+        'ENFORCE_SCHEMA': False,
         'CLIENT': {
-            'host': os.getenv('MONGO_URI'),
-        }
+            'host': os.getenv('MONGO_URI'),  # MongoDB URI
+        },
     }
 }
 
@@ -205,8 +217,8 @@ CELERY_TIMEZONE = 'UTC'
 
 
 CELERY_BEAT_SCHEDULE = {
-    'add-every-3-minutes': {
+    'add-every-5-minutes': {
         'task': 'news.tasks.run_scraper',
-        'schedule': 180.0,  # 180 seconds = 3 minutes
+        'schedule': 350.0,
     },
 }
