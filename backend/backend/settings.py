@@ -87,15 +87,8 @@ MIDDLEWARE = [
 # For development purposes only
 CORS_ALLOW_ALL_ORIGINS = False
 
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000',
-]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-]
-
-CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
 ]
 
@@ -224,7 +217,7 @@ CELERY_TIMEZONE = 'UTC'
 
 
 CELERY_BEAT_SCHEDULE = {
-    'add-every-3-minutes': {
+    'add-every-5-minutes': {
         'task': 'news.tasks.run_scraper',
         'schedule': 350.0,
     },
