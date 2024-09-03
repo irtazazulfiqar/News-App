@@ -46,22 +46,19 @@ class ArticleDateListView(APIView):
 
 
 class ArticleDetailView(generics.GenericAPIView):
-    queryset = Article.objects.all()
     serializer_class = ArticleDetailSerializer
 
-    def post(self, request, *args, **kwargs):
-        post_title = request.data.get('post_title')
-        if not post_title:
-            return Response({'error': 'Post title is required'},
-                            status=status.HTTP_400_BAD_REQUEST)
+    def get(self, request, *args, **kwargs):
+        article_id = kwargs.get('article_id')
+        if not article_id:
+            return Response({'error': 'Article ID is required'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            article = Article.objects.get(post_title=post_title)
+            # Directly fetch the article using its primary key (id)
+            article = Article.objects.get(pk=article_id)
             serializer = self.get_serializer(article)
             return Response(serializer.data)
         except Article.DoesNotExist:
-            return Response({'error': 'Article not found'},
-                            status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'Article not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            return Response({'error': str(e)},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

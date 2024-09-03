@@ -4,9 +4,14 @@ from news.models.article import Article
 
 
 class ArticleSerializer(serializers.ModelSerializer):
+    _id = serializers.SerializerMethodField()
+
     class Meta:
         model = Article
-        fields = ['post_title', 'image_link', 'author_name', 'published_date']
+        fields = ['_id', 'post_title', 'author_name', 'published_date', 'content_paragraphs', 'image_link']
+
+    def get__id(self, obj):
+        return str(obj.pk)
 
 
 class ArticleDateSerializer(serializers.Serializer):

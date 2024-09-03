@@ -15,5 +15,5 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('articles/', ArticleListByDateView.as_view(), name='articles_by_date'),
     path('articles/dates/', ArticleDateListView.as_view(), name='article-date-list'),
-    path('article/details/', ArticleDetailView.as_view(), name='article-detail'),
+    path('article/<str:article_id>/', ArticleDetailView.as_view(), name='article-detail'),
 ]

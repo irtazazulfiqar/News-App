@@ -4,7 +4,7 @@ import { Container, Typography, Card, CardContent, CardMedia, Box } from '@mui/m
 import { apiCallWithAuth } from 'utils/authAPI';
 
 function ArticleDetails() {
-  const { post_title } = useParams();
+  const { article_id } = useParams();
   const [articleDetails, setArticleDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -14,9 +14,7 @@ function ArticleDetails() {
 
     const fetchArticleDetails = async () => {
       try {
-        const payload = { post_title: decodeURIComponent(post_title) };
-
-        const result = await apiCallWithAuth('/api/article/details/', 'POST', payload);
+        const result = await apiCallWithAuth(`/api/article/${article_id}/`, 'GET');
 
         if (isMounted) { // Only update state if component is still mounted
           if (result.success) {
@@ -27,9 +25,9 @@ function ArticleDetails() {
           }
         }
       } catch (error) {
-            if (isMounted) {
-              setError('An error occurred while fetching article details');
-            }
+        if (isMounted) {
+          setError('An error occurred while fetching article details');
+        }
       } finally {
         if (isMounted) {
           setLoading(false);
@@ -37,7 +35,7 @@ function ArticleDetails() {
       }
     };
 
-    if (post_title) {
+    if (article_id) {
       fetchArticleDetails();
     } else {
       setLoading(false);
@@ -47,7 +45,7 @@ function ArticleDetails() {
     return () => {
       isMounted = false; // Clean up flag on unmount
     };
-  }, []);
+  }, [article_id]);
 
   if (loading) {
     return <Typography variant="body1">Loading...</Typography>;
