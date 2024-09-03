@@ -4,11 +4,9 @@ from news.models.article import Article
 
 
 class ArticleSerializer(serializers.ModelSerializer):
-    content_paragraphs = serializers.ListField(child=serializers.CharField(), required=False)
-
     class Meta:
         model = Article
-        fields = '__all__'
+        fields = ['post_title', 'image_link', 'author_name', 'published_date']
 
 
 class ArticleDateSerializer(serializers.Serializer):
@@ -16,3 +14,14 @@ class ArticleDateSerializer(serializers.Serializer):
         child=serializers.DateField(),
         allow_empty=False
     )
+
+
+class ArticleDetailSerializer(serializers.ModelSerializer):
+    content_paragraphs = serializers.ListField(
+        child=serializers.CharField(),
+        allow_empty=True
+    )
+
+    class Meta:
+        model = Article
+        fields = '__all__'
