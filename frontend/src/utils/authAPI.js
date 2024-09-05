@@ -13,7 +13,6 @@ const refreshToken = async () => {
     localStorage.setItem('access_token', response.data.access);
     return response.data.access;
   } catch (error) {
-    console.error('Error refreshing token:', error.response ? error.response.data : error.message); // Log refresh error
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
     window.location.href = '/login';
