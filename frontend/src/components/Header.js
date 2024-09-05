@@ -9,13 +9,21 @@ function Header() {
   return (
     <AppBar position="static" color="primary">
       <Container maxWidth="lg">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+        <Toolbar sx={{ justifyContent: 'space-between' }}>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1, textAlign: 'left' }}>
             News App
           </Typography>
           <div>
             {isAuthenticated ? (
-              <Button color="inherit" onClick={logout}>
+              <Button
+                color="inherit"
+                onClick={logout}
+                sx={{
+                  borderRadius: '50%',
+                  padding: '8px 16px',
+                  marginLeft: 'auto',
+                }}
+              >
                 Logout
               </Button>
             ) : (

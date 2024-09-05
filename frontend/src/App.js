@@ -21,7 +21,7 @@ function App() {
           <Route path="/dashboard" element={
             <ProtectedRoute element={<Dashboard />} />
           } />
-           <Route path="/articles/:post_title" element={
+           <Route path="/articles/:article_id" element={
             <ProtectedRoute element={<ArticleDetails />} />
           } />
         </Routes>

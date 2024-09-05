@@ -1,6 +1,8 @@
 import os
 from datetime import timedelta
 from pathlib import Path
+
+import certifi
 import pymysql
 from dotenv import load_dotenv
 
@@ -69,8 +71,7 @@ REST_FRAMEWORK = {
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
 
     # Exception handling
-    'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler',
-
+    'EXCEPTION_HANDLER': 'rest_framework.api.exception_handler',
 
 }
 
@@ -110,7 +111,11 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': False,
     'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'VERIFYING_KEY': None,
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
 ROOT_URLCONF = 'backend.urls'
@@ -148,9 +153,11 @@ DATABASES = {
     'mongodb': {
         'ENGINE': 'djongo',
         'NAME': os.getenv('MONGO_DB_NAME'),
+        'ENFORCE_SCHEMA': False,
         'CLIENT': {
             'host': os.getenv('MONGO_URI'),
-        }
+            'tlsCAFile': certifi.where(),  # Ensure SSL verification with certifi
+        },
     }
 }
 
@@ -206,8 +213,8 @@ CELERY_TIMEZONE = 'UTC'
 
 
 CELERY_BEAT_SCHEDULE = {
-    'add-every-3-minutes': {
+    'add-every-5-minutes': {
         'task': 'news.tasks.run_scraper',
-        'schedule': 180.0,  # 180 seconds = 3 minutes
+        'schedule': 350.0,
     },
 }

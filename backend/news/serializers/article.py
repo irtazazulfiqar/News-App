@@ -4,15 +4,14 @@ from news.models.article import Article
 
 
 class ArticleSerializer(serializers.ModelSerializer):
-    content_paragraphs = serializers.ListField(child=serializers.CharField(), required=False)
+    _id = serializers.SerializerMethodField()
 
     class Meta:
         model = Article
-        fields = '__all__'
+        fields = ['_id', 'post_title', 'author_name', 'published_date', 'content_paragraphs', 'image_link']
 
-
-class DateValidatorSerializer(serializers.Serializer):
-    date = serializers.DateField(input_formats=['%Y-%m-%d'])
+    def get__id(self, obj):
+        return str(obj.pk)
 
 
 class ArticleDateSerializer(serializers.Serializer):
@@ -20,3 +19,14 @@ class ArticleDateSerializer(serializers.Serializer):
         child=serializers.DateField(),
         allow_empty=False
     )
+
+
+class ArticleDetailSerializer(serializers.ModelSerializer):
+    content_paragraphs = serializers.ListField(
+        child=serializers.CharField(),
+        allow_empty=True
+    )
+
+    class Meta:
+        model = Article
+        fields = '__all__'
