@@ -1,12 +1,12 @@
 from datetime import datetime
-
 from rest_framework import generics, status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from news.models.article import Article
 from news.serializers.article import (ArticleSerializer,
-                                      ArticleDateSerializer)
+                                      ArticleDateSerializer,
+                                      ArticleDetailSerializer)
 
 
 class CustomPagination(PageNumberPagination):
@@ -43,3 +43,22 @@ class ArticleDateListView(APIView):
         serializer = ArticleDateSerializer({'dates': article_dates})
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ArticleDetailView(generics.GenericAPIView):
+    serializer_class = ArticleDetailSerializer
+
+    def get(self, request, *args, **kwargs):
+        article_id = kwargs.get('article_id')
+        if not article_id:
+            return Response({'error': 'Article ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Directly fetch the article using its primary key (id)
+            article = Article.objects.get(pk=article_id)
+            serializer = self.get_serializer(article)
+            return Response(serializer.data)
+        except Article.DoesNotExist:
+            return Response({'error': 'Article not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

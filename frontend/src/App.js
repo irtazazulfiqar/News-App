@@ -8,6 +8,7 @@ import Footer from 'components/Footer';
 import ProtectedRoute from 'utils/ProtectedRoute';
 import { AuthProvider } from 'context/AuthContext';
 import { Box, Container } from '@mui/material';
+import ArticleDetails from 'pages/ArticleDetails';
 
 function App() {
   return (
@@ -19,6 +20,9 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/dashboard" element={
             <ProtectedRoute element={<Dashboard />} />
+          } />
+           <Route path="/articles/:article_id" element={
+            <ProtectedRoute element={<ArticleDetails />} />
           } />
         </Routes>
        </AuthProvider>

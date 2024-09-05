@@ -106,9 +106,9 @@ function Dashboard() {
           )}
           <Grid container spacing={3}>
             {articles.map((article) => (
-              <Grid item xs={12} sm={6} md={4} key={article.post_title}>
+              <Grid item xs={12} sm={6} md={4} key={article._id}>
                 <Link
-                  to={`/articles/${encodeURIComponent(article.post_title)}`}
+                  to={`/articles/${encodeURIComponent(article._id)}`}
                   state={{ article }}
                   style={{ textDecoration: 'none' }}
                 >

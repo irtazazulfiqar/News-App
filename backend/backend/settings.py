@@ -1,6 +1,8 @@
 import os
 from datetime import timedelta
 from pathlib import Path
+
+import certifi
 import pymysql
 from dotenv import load_dotenv
 
@@ -111,7 +113,7 @@ CORS_ALLOW_METHODS = [
 
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=2),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -157,10 +159,11 @@ DATABASES = {
     },
     'mongodb': {
         'ENGINE': 'djongo',
-        'NAME': os.getenv('MONGO_DB_NAME'),  # MongoDB database name
+        'NAME': os.getenv('MONGO_DB_NAME'),
         'ENFORCE_SCHEMA': False,
         'CLIENT': {
-            'host': os.getenv('MONGO_URI'),  # MongoDB URI
+            'host': os.getenv('MONGO_URI'),
+            'tlsCAFile': certifi.where(),  # Ensure SSL verification with certifi
         },
     }
 }
