@@ -13,16 +13,16 @@ const ArticleCalendar = ({ onDateChange }) => {
   useEffect(() => {
     const fetchDates = async () => {
       try {
-        const response = await axios('/api/article-dates');
+        const response = await axios('/api/articles/dates');
         if (response.status === 200) {
           // Ensure dates are parsed correctly as Date objects
           const dates = response.data.dates.map(date => parseISO(date));
           setArticleDates(dates);
         } else {
-          console.error('Error fetching article dates:', response.data.errors);
+          alert('Error fetching article dates:', response.data.errors);
         }
       } catch (error) {
-        console.error('Error fetching article dates:', error);
+          alert('Error fetching article dates:', error);
       }
     };
 
