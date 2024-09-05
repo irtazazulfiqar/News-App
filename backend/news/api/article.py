@@ -1,5 +1,6 @@
 from datetime import datetime
 from rest_framework import generics, status
+from rest_framework.exceptions import ValidationError
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -26,7 +27,7 @@ class ArticleListByDateView(generics.ListAPIView):
         try:
             date = datetime.strptime(date_str, '%Y-%m-%d').date()
         except (TypeError, ValueError):
-            return Response({'error': 'Invalid date format'}, status=status.HTTP_400_BAD_REQUEST)
+            raise ValidationError({'error': 'Invalid date format'})
 
         # Get filtered articles using the custom method in Article Model
         return Article.get_filtered_articles(date_str)
