@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Container, Typography, Card, CardContent, CardMedia, Box } from '@mui/material';
-import axios from 'axios'; // Import your axios instance
+import axios from 'axios';
 
 function ArticleDetails() {
   const { article_id } = useParams();
