@@ -23,7 +23,8 @@ class TestFetchArticlesCommand(TestCase):
         call_command('fetch_articles', '2024-09-01', '2024-09-10', stdout=out)
 
         # Assert: Check if fetch_articles_by_date_range was called with the correct dates
-        mock_fetch_articles.assert_called_once_with(datetime(2024, 9, 1).date(), datetime(2024, 9, 10).date())
+        mock_fetch_articles.assert_called_once_with(datetime(2024, 9, 1).date(),
+                                                    datetime(2024, 9, 10).date())
 
         # Check the output
         self.assertIn("Total articles fetched: 2", out.getvalue())

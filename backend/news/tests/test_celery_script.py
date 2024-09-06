@@ -14,7 +14,8 @@ class TestArticleScraper(TestCase):
         # Arrange: Mock a successful HTTP response
         mock_response = MagicMock()
         mock_response.status_code = 200
-        mock_response.content = '<html><body><div class="test">Test Content</div></body></html>'
+        mock_response.content = ('<html><body><div class="test">Test Content'
+                                 '</div></body></html>')
         mock_get.return_value = mock_response
 
         # Act: Call the fetch_and_parse method
@@ -41,7 +42,8 @@ class TestArticleScraper(TestCase):
     def test_crawl_and_process_links(self, mock_fetch_and_parse):
         # Arrange: Mock a response from fetch_and_parse
         mock_soup = BeautifulSoup('<html><div class="writter-list-item-story"><a '
-                                  'href="https://example.com"></a></div></html>', 'html.parser')
+                                  'href="https://example.com"></a></div></html>',
+                                  'html.parser')
         mock_fetch_and_parse.return_value = mock_soup
 
         scraper = ArticleScraper()
@@ -67,7 +69,8 @@ class TestArticleScraper(TestCase):
         mock_fetch_and_parse.return_value = post_soup
 
         scraper = ArticleScraper(target_date='2024-09-06')
-        story_items = [BeautifulSoup('<div class="writter-list-item-story"><a href="https://example.com"></a></div>',
+        story_items = [BeautifulSoup('<div class="writter-list-item-story"><a '
+                                     'href="https://example.com"></a></div>',
                                      'html.parser')]
 
         # Act: Call process_story_links with mocked data

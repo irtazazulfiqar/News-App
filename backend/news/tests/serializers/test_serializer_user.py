@@ -9,7 +9,8 @@ class TestUserSerializer(TestCase):
 
     def setUp(self):
         # Create an existing user to test duplicate email validation
-        self.existing_user = User.objects.create_user(email='existing_user@example.com', password='Testpass123!')
+        self.existing_user = User.objects.create_user(email='existing_user@example.com',
+                                                      password='Testpass123!')
 
     def test_valid_user_creation(self):
         # Test case for successful user creation
@@ -34,7 +35,8 @@ class TestUserSerializer(TestCase):
         serializer = UserSerializer(data=data)
         self.assertFalse(serializer.is_valid())
         self.assertIn('non_field_errors', serializer.errors)
-        self.assertEqual(serializer.errors['non_field_errors'][0], "Passwords do not match.")
+        self.assertEqual(serializer.errors['non_field_errors'][0],
+                         "Passwords do not match.")
 
     def test_invalid_email_format(self):
         # Test case for invalid email format

@@ -38,7 +38,8 @@ class ArticleModelTest(TestCase):
             published_date=date(2024, 9, 4),
             content_paragraphs=['This is a test article 2.']
         )
-        filtered_articles = Article.get_filtered_articles(date(2024, 9, 4))
+        filtered_articles = Article.get_filtered_articles(
+            date(2024, 9, 4))
         self.assertEqual(len(filtered_articles), 1)
         self.assertEqual(filtered_articles[0].post_title, 'Test Article 1')
 

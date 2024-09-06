@@ -5,7 +5,8 @@ from news.models.user import User
 class UserModelTest(TestCase):
 
     def setUp(self):
-        self.user = User.objects.create_user(email="test@example.com", password="testpass123")
+        self.user = User.objects.create_user(email="test@example.com",
+                                             password="testpass123")
 
     def test_user_creation(self):
         self.assertEqual(self.user.email, "test@example.com")
@@ -18,6 +19,7 @@ class UserModelTest(TestCase):
         self.assertTrue(self.user.is_active)
 
     def test_superuser_creation(self):
-        admin_user = User.objects.create_superuser(email="admin@example.com", password="adminpass")
+        admin_user = User.objects.create_superuser(email="admin@example.com",
+                                                   password="adminpass")
         self.assertTrue(admin_user.is_staff)
         self.assertTrue(admin_user.is_superuser)
