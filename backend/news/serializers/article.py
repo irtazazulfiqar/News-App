@@ -8,7 +8,7 @@ class ArticleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Article
-        fields = ['_id', 'post_title', 'author_name', 'published_date', 'content_paragraphs', 'image_link']
+        fields = ['_id', 'post_title', 'author_name', 'published_date', 'image_link']
 
     def get__id(self, obj):
         return str(obj.pk)
