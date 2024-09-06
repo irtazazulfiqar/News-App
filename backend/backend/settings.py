@@ -71,7 +71,7 @@ REST_FRAMEWORK = {
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
 
     # Exception handling
-    'EXCEPTION_HANDLER': 'rest_framework.api.exception_handler',
+    'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler',
 
 }
 
@@ -86,8 +86,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# For development purposes only
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False
+
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
 
 CORS_ALLOW_HEADERS = [
     'content-type',
@@ -107,7 +111,7 @@ CORS_ALLOW_METHODS = [
 
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,

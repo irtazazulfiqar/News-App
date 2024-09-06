@@ -18,8 +18,6 @@ const ArticleCalendar = ({ onDateChange }) => {
           // Ensure dates are parsed correctly as Date objects
           const dates = response.data.dates.map(date => parseISO(date));
           setArticleDates(dates);
-        } else {
-          alert('Error fetching article dates:', response.data.errors);
         }
       } catch (error) {
           alert('Error fetching article dates:', error);

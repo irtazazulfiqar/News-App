@@ -21,13 +21,11 @@ function ArticleDetails() {
             const data = result.data;
             data.content_paragraphs = data.content_paragraphs.filter(paragraph => paragraph.trim() !== '');
             setArticleDetails(data);
-          } else {
-            setError('Failed to fetch article details');
           }
         }
       } catch (error) {
         if (isMounted) {
-          setError('An error occurred while fetching article details');
+          setError('Failed to fetch article details');
         }
       } finally {
         if (isMounted) {
