@@ -28,7 +28,7 @@ const fetchArticles = async (page, rowsPerPage) => {
     if (error.response) {
       // Handle max request limit or other server errors
       if (error.response.status === 429) {
-        setError('You have exceeded the maximum number of requests. Please try again later.');
+        setError('Something went wrong. Please try again later.');
       } else {
         setError(`Error: ${error.response.status} - ${error.response.data.detail || 'Something went wrong'}`);
       }
