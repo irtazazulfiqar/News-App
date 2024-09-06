@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Container, Typography, Card, CardContent, CardMedia, Box } from '@mui/material';
-import { apiCallWithAuth } from 'utils/authAPI';
+import axios from 'axios';
 
 function ArticleDetails() {
   const { article_id } = useParams();
@@ -14,19 +14,16 @@ function ArticleDetails() {
 
     const fetchArticleDetails = async () => {
       try {
-        const result = await apiCallWithAuth(`/api/article/${article_id}/`, 'GET');
+        const result = await axios.get(`/api/article/${article_id}/`);
 
         if (isMounted) { // Only update state if component is still mounted
-          if (result.success) {
-            result.data.content_paragraphs = result.data.content_paragraphs.filter(paragraph => paragraph.trim() !== '');
-            setArticleDetails(result.data);
-          } else {
-            setError('Failed to fetch article details');
-          }
+            const data = result.data;
+            data.content_paragraphs = data.content_paragraphs.filter(paragraph => paragraph.trim() !== '');
+            setArticleDetails(data);
         }
       } catch (error) {
         if (isMounted) {
-          setError('An error occurred while fetching article details');
+          setError('Failed to fetch article details');
         }
       } finally {
         if (isMounted) {
