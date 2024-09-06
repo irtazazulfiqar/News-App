@@ -14,11 +14,9 @@ const ArticleCalendar = ({ onDateChange }) => {
     const fetchDates = async () => {
       try {
         const response = await axios('/api/articles/dates');
-        if (response.status === 200) {
           // Ensure dates are parsed correctly as Date objects
           const dates = response.data.dates.map(date => parseISO(date));
           setArticleDates(dates);
-        }
       } catch (error) {
           alert('Error fetching article dates:', error);
       }
@@ -27,12 +25,6 @@ const ArticleCalendar = ({ onDateChange }) => {
     fetchDates();
   }, []);
 
-  useEffect(() => {
-    if (selectedDate) {
-      // Notify the parent component of the selected date change
-      onDateChange(selectedDate);
-    }
-  }, [selectedDate, onDateChange]);
 
   const isDateDisabled = (date) => {
     const today = new Date();

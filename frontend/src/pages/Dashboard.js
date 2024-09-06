@@ -15,26 +15,26 @@ function Dashboard() {
   const [selectedDate, setSelectedDate] = useState(new Date());
 
 const fetchArticles = async (page, rowsPerPage) => {
-
   try {
     const formattedDate = format(selectedDate, 'yyyy-MM-dd');
     const url = `/api/articles/?date=${formattedDate}&page=${page + 1}&page_size=${rowsPerPage}`;
     const result = await axios.get(url);
 
-    if (result.status === 200) {
-      const data = result.data;
-      setArticles(data.results);
-
-      setTotalPages(Math.ceil(data.count / rowsPerPage));
-      setError(null);
-    } else {
-      setError('Failed to fetch articles');
-    }
+    const data = result.data;
+    setArticles(data.results);
+    setTotalPages(Math.ceil(data.count / rowsPerPage));
+    setError(null);
   } catch (error) {
-    if (axios.isCancel(error)) {
-      setError('Request Cancelled');
+    if (error.response) {
+      // Handle max request limit or other server errors
+      if (error.response.status === 429) {
+        setError('You have exceeded the maximum number of requests. Please try again later.');
+      } else {
+        setError(`Error: ${error.response.status} - ${error.response.data.detail || 'Something went wrong'}`);
+      }
     } else {
-      setError('Something went wrong');
+      // Generic error for network issues or other failures
+      setError('Something went wrong. Please try again.');
     }
   } finally {
     setLoading(false);

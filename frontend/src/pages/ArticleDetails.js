@@ -17,11 +17,9 @@ function ArticleDetails() {
         const result = await axios.get(`/api/article/${article_id}/`);
 
         if (isMounted) { // Only update state if component is still mounted
-          if (result.status === 200) {
             const data = result.data;
             data.content_paragraphs = data.content_paragraphs.filter(paragraph => paragraph.trim() !== '');
             setArticleDetails(data);
-          }
         }
       } catch (error) {
         if (isMounted) {
