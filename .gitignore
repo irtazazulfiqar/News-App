@@ -28,6 +28,8 @@ frontend/.pnp.js
 # testing
 frontend/coverage
 
+backend/.coverage
+
 # production
 frontend/build
 
