@@ -136,7 +136,7 @@ function SignIn() {
           )}
           {Object.keys(errors).length > 0 && (
             <Alert severity="error" style={{ marginTop: '20px' }}>
-              Please check the fields and try again.
+              Please fill all fields
             </Alert>
           )}
         </Box>
