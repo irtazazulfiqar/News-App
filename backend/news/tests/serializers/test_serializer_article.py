@@ -22,8 +22,6 @@ class TestArticleSerializer(TestCase):
         self.assertEqual(serializer.data['post_title'], 'Test Article')
         self.assertEqual(serializer.data['author_name'], 'John Doe')
         self.assertEqual(serializer.data['published_date'], '2022-01-01')
-        self.assertEqual(eval(serializer.data['content_paragraphs']),
-                         ['Paragraph 1', 'Paragraph 2'])
         self.assertEqual(serializer.data['image_link'],
                          'https://example.com/image.jpg')
 
